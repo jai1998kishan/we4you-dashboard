@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useRef, useCallback, memo } from 'react';
 import {
   User,
@@ -10,6 +13,8 @@ import {
   Upload,
   X,
 } from 'lucide-react';
+import { Link, useNavigate } from '@tanstack/react-router';
+import axios from 'axios';
 
 // Define form data structure
 interface FormData {
@@ -38,13 +43,13 @@ const PremiumRegistrationForm: React.FC = () => {
     pincode: '',
     no_of_vehicles: '',
   });
-  const [profileImage, setProfileImage] = useState<File | null>(null);
+  const [profile_image, setprofile_image] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [focusedField, setFocusedField] = useState<keyof FormData | 'lat' | 'long' | ''>(
     ''
   );
   const fileInputRef = useRef<HTMLInputElement>(null);
-
+const navigate = useNavigate()
   // Unified handler with useCallback
   const handleInputChange = useCallback(
     (field: keyof FormData, e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,7 +66,7 @@ const PremiumRegistrationForm: React.FC = () => {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (file) {
-        setProfileImage(file);
+        setprofile_image(file);
         const reader = new FileReader();
         reader.onload = (event) => {
           setImagePreview(event.target?.result as string);
@@ -73,7 +78,7 @@ const PremiumRegistrationForm: React.FC = () => {
   );
 
   const removeImage = useCallback(() => {
-    setProfileImage(null);
+    setprofile_image(null);
     setImagePreview(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -114,15 +119,80 @@ const PremiumRegistrationForm: React.FC = () => {
     ];
     return (
       requiredFields.every((field) => formData[field].trim() !== '') &&
-      profileImage !== null
+      profile_image !== null
     );
-  }, [formData, profileImage]);
+  }, [formData, profile_image]);
 
-  const handleSubmit = useCallback(() => {
-    if (isFormValid()) {
-      console.log('Form submitted:', formData);
+const storedData = localStorage.getItem('authData')
+
+if (storedData) {
+  const authData = JSON.parse(storedData)
+  const sessionKey: string = authData.sessionkey
+  console.log('Session Key:', sessionKey)
+} else {
+  console.warn('No authData in localStorage')
+}
+
+
+
+
+
+const handleSubmit = useCallback(async () => {
+  if (!isFormValid()) return;
+  const storedData = localStorage.getItem('authData');
+  let sessionKey = '';
+  if (storedData) {
+    try {
+      const authData = JSON.parse(storedData);
+      sessionKey = authData.sessionkey;
+      console.log('Session Key:', sessionKey);
+    } catch (error) {
+      console.error('Failed to parse authData:', error);
+      alert('Authentication data is invalid.');
+      return;
     }
-  }, [formData, isFormValid]);
+  } else {
+    alert('No authentication data found. Please log in again.');
+    return;
+  }
+
+  // Create FormData to hold both text and file inputs
+  const formDataToSend = new FormData();
+
+  // Append all form fields
+  Object.entries(formData).forEach(([key, value]) => {
+    formDataToSend.append(key, value);
+  });
+
+  // Append profile image if exists
+  if (profile_image) {
+    formDataToSend.append('profile_image', profile_image); // Adjust backend field name as needed
+  }
+
+  try {
+    const response = await axios.post(
+      'https://aeba-2401-4900-8846-d79b-acbb-808c-1b4c-3cb.ngrok-free.app/vendors/profile', 
+      formDataToSend,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${sessionKey}`, // Send session key as Bearer token
+        },
+      }
+    );
+
+    console.log('Profile created successfully:', response.data);
+if(response.status==200){
+    navigate({to: "/registration-vendor-company"})
+}
+    // Optionally redirect or reset form
+  } catch (error: any) {
+    console.error('Error submitting form:', error);
+    const errorMessage =
+      error.response?.data?.message || 'Failed to submit registration. Please try again.';
+    alert(errorMessage);
+  }
+}, [formData, profile_image, isFormValid]);
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">

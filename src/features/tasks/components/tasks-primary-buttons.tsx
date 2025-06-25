@@ -6,6 +6,13 @@ export function TasksPrimaryButtons() {
   const { setOpen } = useTasks()
   return (
     <div className='flex gap-2'>
+         <Button
+        variant='outline'
+        className='space-x-1'
+       
+      >
+        <span>See Requests</span> 
+      </Button>
       <Button
         variant='outline'
         className='space-x-1'

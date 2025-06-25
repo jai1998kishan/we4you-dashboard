@@ -85,8 +85,9 @@ export default function Apps() {
                 <SelectItem value='connected'>Connected</SelectItem>
                 <SelectItem value='notConnected'>Not Connected</SelectItem>
               </SelectContent>
+              <button className='bg-[#FFA500] text-sm p-2 border rounded-lg text-white'>Add Driver</button>
             </Select>
-          </div>
+          </div> 
 
           <Select value={sort} onValueChange={setSort}>
             <SelectTrigger className='w-16'>

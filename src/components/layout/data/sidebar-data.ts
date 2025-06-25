@@ -53,6 +53,16 @@ export const sidebarData: SidebarData = {
           icon: IconChecklist,
         },
         {
+          title: 'Request Vendors',
+          url: '/request-vendors',
+          icon: IconChecklist,
+        },
+        {
+          title: 'Request Drivers',
+          url: '/request-drivers',
+          icon: IconPackages,
+        },
+        {
           title: 'Drivers',
           url: '/apps',
           icon: IconPackages,
