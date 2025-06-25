@@ -22,7 +22,7 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { apps } from './data/apps'
 
 const appText = new Map<string, string>([
-  ['all', 'All Apps'],
+  ['all', 'All Drivers'],
   ['connected', 'Connected'],
   ['notConnected', 'Not Connected'],
 ])
@@ -62,16 +62,16 @@ export default function Apps() {
       <Main fixed>
         <div>
           <h1 className='text-2xl font-bold tracking-tight'>
-            App Integrations
+            Drivers
           </h1>
           <p className='text-muted-foreground'>
-            Here&apos;s a list of your apps for the integration!
+            Here&apos;s a list of your drivers for the Rides!
           </p>
         </div>
         <div className='my-4 flex items-end justify-between sm:my-0 sm:items-center'>
           <div className='flex flex-col gap-4 sm:my-4 sm:flex-row'>
             <Input
-              placeholder='Filter apps...'
+              placeholder='Filter drivers...'
               className='h-9 w-40 lg:w-[250px]'
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -81,7 +81,7 @@ export default function Apps() {
                 <SelectValue>{appText.get(appType)}</SelectValue>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value='all'>All Apps</SelectItem>
+                <SelectItem value='all'>All Drivers</SelectItem>
                 <SelectItem value='connected'>Connected</SelectItem>
                 <SelectItem value='notConnected'>Not Connected</SelectItem>
               </SelectContent>

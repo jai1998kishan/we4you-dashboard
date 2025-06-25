@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link } from '@tanstack/react-router'
-import { IconBrandFacebook, IconBrandGithub } from '@tabler/icons-react'
+import {  IconViewfinderOff } from '@tabler/icons-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/password-input'
+import { useNavigate } from '@tanstack/react-router'
 
 type UserAuthFormProps = HTMLAttributes<HTMLFormElement>
 
@@ -36,6 +37,7 @@ const formSchema = z.object({
 
 export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
   const [isLoading, setIsLoading] = useState(false)
+const navigate = useNavigate()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -49,10 +51,11 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
     setIsLoading(true)
     // eslint-disable-next-line no-console
     console.log(data)
-
     setTimeout(() => {
+      
       setIsLoading(false)
-    }, 3000)
+      navigate({ to: '/' }) // ✅ redirect to homepage
+    }, 1000)
   }
 
   return (
@@ -104,18 +107,15 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
           </div>
           <div className='relative flex justify-center text-xs uppercase'>
             <span className='bg-background text-muted-foreground px-2'>
-              Or continue with
+              New Vendor ?
             </span>
           </div>
         </div>
 
-        <div className='grid grid-cols-2 gap-2'>
-          <Button variant='outline' type='button' disabled={isLoading}>
-            <IconBrandGithub className='h-4 w-4' /> GitHub
-          </Button>
-          <Button variant='outline' type='button' disabled={isLoading}>
-            <IconBrandFacebook className='h-4 w-4' /> Facebook
-          </Button>
+        <div className='grid grid-cols-1 gap-1'>
+        <Link to='/sign-up' className='grid grid-cols-1 gap-1'>  <Button variant='outline' type='button' disabled={isLoading}>
+            <IconViewfinderOff className='h-4 w-4' /> Register as a Vendor
+          </Button></Link>
         </div>
       </form>
     </Form>
