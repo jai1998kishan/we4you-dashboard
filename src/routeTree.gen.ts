@@ -124,7 +124,7 @@ const authRegistration1Route = authRegistration1Import.update({
 
 const authOtpRoute = authOtpImport.update({
   id: '/(auth)/otp',
-  path: '/registration-vendor',
+  path: '/otp',
   getParentRoute: () => rootRoute,
 } as any)
 

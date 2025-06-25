@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, memo } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   User,
   Mail,
@@ -25,7 +25,7 @@ interface FormData {
   no_of_vehicles: string;
 }
 
-const PremiumRegistrationForm: React.FC = () => {
+const PremiumRegistrationForm2: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
     fullname: '',
     email: '',
@@ -40,47 +40,51 @@ const PremiumRegistrationForm: React.FC = () => {
   });
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [focusedField, setFocusedField] = useState<keyof FormData | 'lat' | 'long' | ''>(
-    ''
-  );
+  const [focusedField, setFocusedField] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Unified handler with useCallback
-  const handleInputChange = useCallback(
-    (field: keyof FormData, e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
+  const handleInputChange = (field: keyof FormData, value: string) => {
+    if (field === 'pincode' || field === 'no_of_vehicles') {
+      const numericValue = value.replace(/[^0-9]/g, '');
+      setFormData((prev) => ({
+        ...prev,
+        [field]: numericValue,
+      }));
+    } else if (field === 'lat' || field === 'long') {
+      const coordinateValue = value.replace(/[^0-9.-]/g, '');
+      setFormData((prev) => ({
+        ...prev,
+        [field]: coordinateValue,
+      }));
+    } else {
       setFormData((prev) => ({
         ...prev,
         [field]: value,
       }));
-    },
-    []
-  );
+    }
+  };
 
-  const handleImageUpload = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (file) {
-        setProfileImage(file);
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          setImagePreview(event.target?.result as string);
-        };
-        reader.readAsDataURL(file);
-      }
-    },
-    []
-  );
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setProfileImage(file);
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setImagePreview(event.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
-  const removeImage = useCallback(() => {
+  const removeImage = () => {
     setProfileImage(null);
     setImagePreview(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-  }, []);
+  };
 
-  const getCurrentLocation = useCallback(() => {
+  const getCurrentLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -97,9 +101,9 @@ const PremiumRegistrationForm: React.FC = () => {
     } else {
       alert('Geolocation is not supported by this browser.');
     }
-  }, []);
+  };
 
-  const isFormValid = useCallback((): boolean => {
+  const isFormValid = (): boolean => {
     const requiredFields: Array<keyof FormData> = [
       'fullname',
       'email',
@@ -116,13 +120,61 @@ const PremiumRegistrationForm: React.FC = () => {
       requiredFields.every((field) => formData[field].trim() !== '') &&
       profileImage !== null
     );
-  }, [formData, profileImage]);
+  };
 
-  const handleSubmit = useCallback(() => {
+  const handleSubmit = () => {
     if (isFormValid()) {
-      console.log('Form submitted:', formData);
+
+      // Handle form submission here
     }
-  }, [formData, isFormValid]);
+  };
+
+  interface InputFieldProps {
+    label: string;
+    field: keyof FormData;
+    type?: string;
+    icon: React.ElementType;
+    placeholder?: string;
+    inputMode?:
+      | 'none'
+      | 'text'
+      | 'decimal'
+      | 'numeric'
+      | 'tel'
+      | 'search'
+      | 'email'
+      | 'url';
+  }
+
+  const InputField: React.FC<InputFieldProps> = ({
+    label,
+    field,
+    type = 'text',
+    icon: Icon,
+    placeholder,
+    inputMode = 'text',
+  }) => (
+    <div className="space-y-2">
+      <label className="text-sm font-medium text-gray-700 flex items-center space-x-2">
+        <Icon className="w-4 h-4" />
+        <span>{label}</span>
+      </label>
+      <input
+        type={type}
+        inputMode={inputMode}
+        value={formData[field]}
+        onChange={(e) => handleInputChange(field, e.target.value)}
+        onFocus={() => setFocusedField(field)}
+        onBlur={() => setFocusedField('')}
+        placeholder={placeholder}
+        className={`
+          w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 ease-out
+          ${focusedField === field ? 'border-gray-900 bg-white shadow-lg' : 'border-gray-200 bg-gray-50'}
+          hover:border-gray-300 focus:outline-none text-gray-900 placeholder-gray-500
+        `}
+      />
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
@@ -134,9 +186,10 @@ const PremiumRegistrationForm: React.FC = () => {
             <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-900 rounded-2xl mb-4 shadow-lg">
               <User className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Complete Registration</h1>
-            <p className="text-gray-600 text-sm">Fill in your details to create your account</p>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">Complete Company Registration</h1>
+            <p className="text-gray-600 text-sm">Fill in your details to create your company account</p>
           </div>
+
           {/* Form */}
           <div className="space-y-6">
             {/* Profile Image Upload */}
@@ -188,10 +241,6 @@ const PremiumRegistrationForm: React.FC = () => {
                 field="fullname"
                 icon={User}
                 placeholder="Enter your full name"
-                value={formData.fullname}
-                onChange={handleInputChange}
-                onFocus={() => setFocusedField('fullname')}
-                onBlur={() => setFocusedField('')}
               />
               <InputField
                 label="Email Address"
@@ -199,10 +248,6 @@ const PremiumRegistrationForm: React.FC = () => {
                 type="email"
                 icon={Mail}
                 placeholder="your@email.com"
-                value={formData.email}
-                onChange={handleInputChange}
-                onFocus={() => setFocusedField('email')}
-                onBlur={() => setFocusedField('')}
               />
             </div>
 
@@ -212,10 +257,6 @@ const PremiumRegistrationForm: React.FC = () => {
               field="address"
               icon={MapPin}
               placeholder="Enter your complete address"
-              value={formData.address}
-              onChange={handleInputChange}
-              onFocus={() => setFocusedField('address')}
-              onBlur={() => setFocusedField('')}
             />
 
             {/* Location Coordinates */}
@@ -233,25 +274,39 @@ const PremiumRegistrationForm: React.FC = () => {
                 </button>
               </label>
               <div className="grid grid-cols-2 gap-4">
-                <InputField
-                  label=""
-                  field="lat"
-                  type="text"
-                  placeholder="Latitude"
+                <input
+                  type="number"
+                  step="any"
                   value={formData.lat}
-                  onChange={handleInputChange}
+                  onChange={(e) => handleInputChange('lat', e.target.value)}
                   onFocus={() => setFocusedField('lat')}
                   onBlur={() => setFocusedField('')}
+                  placeholder="Latitude"
+                  className={`
+                    w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 ease-out
+                    ${focusedField === 'lat'
+                      ? 'border-gray-900 bg-white shadow-lg'
+                      : 'border-gray-200 bg-gray-50'
+                    }
+                    hover:border-gray-300 focus:outline-none text-gray-900 placeholder-gray-500
+                  `}
                 />
-                <InputField
-                  label=""
-                  field="long"
-                  type="text"
-                  placeholder="Longitude"
+                <input
+                  type="number"
+                  step="any"
                   value={formData.long}
-                  onChange={handleInputChange}
+                  onChange={(e) => handleInputChange('long', e.target.value)}
                   onFocus={() => setFocusedField('long')}
                   onBlur={() => setFocusedField('')}
+                  placeholder="Longitude"
+                  className={`
+                    w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 ease-out
+                    ${focusedField === 'long'
+                      ? 'border-gray-900 bg-white shadow-lg'
+                      : 'border-gray-200 bg-gray-50'
+                    }
+                    hover:border-gray-300 focus:outline-none text-gray-900 placeholder-gray-500
+                  `}
                 />
               </div>
             </div>
@@ -263,30 +318,18 @@ const PremiumRegistrationForm: React.FC = () => {
                 field="country"
                 icon={Globe}
                 placeholder="India"
-                value={formData.country}
-                onChange={handleInputChange}
-                onFocus={() => setFocusedField('country')}
-                onBlur={() => setFocusedField('')}
               />
               <InputField
                 label="State"
                 field="state"
                 icon={MapPin}
                 placeholder="Uttar Pradesh"
-                value={formData.state}
-                onChange={handleInputChange}
-                onFocus={() => setFocusedField('state')}
-                onBlur={() => setFocusedField('')}
               />
               <InputField
                 label="City"
                 field="city"
                 icon={MapPin}
                 placeholder="Ghaziabad"
-                value={formData.city}
-                onChange={handleInputChange}
-                onFocus={() => setFocusedField('city')}
-                onBlur={() => setFocusedField('')}
               />
             </div>
 
@@ -295,24 +338,18 @@ const PremiumRegistrationForm: React.FC = () => {
               <InputField
                 label="Pincode"
                 field="pincode"
-                type="number"
+                type="text"
+                inputMode="numeric"
                 icon={MapPin}
                 placeholder="201001"
-                value={formData.pincode}
-                onChange={handleInputChange}
-                onFocus={() => setFocusedField('pincode')}
-                onBlur={() => setFocusedField('')}
               />
               <InputField
                 label="Number of Vehicles"
                 field="no_of_vehicles"
-                type="number"
+                type="text"
+                inputMode="numeric"
                 icon={Car}
                 placeholder="2"
-                value={formData.no_of_vehicles}
-                onChange={handleInputChange}
-                onFocus={() => setFocusedField('no_of_vehicles')}
-                onBlur={() => setFocusedField('')}
               />
             </div>
 
@@ -352,43 +389,4 @@ const PremiumRegistrationForm: React.FC = () => {
   );
 };
 
-// InputField moved outside and memoized
-interface InputFieldProps {
-  label: string;
-  field: keyof FormData;
-  type?: string;
-  icon?: React.ElementType;
-  placeholder?: string;
-  value: string;
-  onChange: (field: keyof FormData, e: React.ChangeEvent<HTMLInputElement>) => void;
-  onFocus: () => void;
-  onBlur: () => void;
-}
-
-const InputField: React.FC<InputFieldProps> = memo(
-  ({ label, field, type = 'text', icon: Icon, placeholder, value, onChange, onFocus, onBlur }) => (
-    <div className="space-y-2">
-      {label && (
-        <label className="text-sm font-medium text-gray-700 flex items-center space-x-2">
-          {Icon && <Icon className="w-4 h-4" />}
-          <span>{label}</span>
-        </label>
-      )}
-      <input
-        type={type}
-        value={value}
-        onChange={(e) => onChange(field, e)}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        placeholder={placeholder}
-        className={`
-          w-full px-4 py-3 rounded-xl border-2 transition-all duration-300 ease-out
-         'border-gray-900 bg-white shadow-lg' : 'border-gray-200 bg-gray-50'}
-          hover:border-gray-300 focus:outline-none text-gray-900 placeholder-gray-500
-        `}
-      />
-    </div>
-  )
-);
-
-export default PremiumRegistrationForm;
+export default PremiumRegistrationForm2;
