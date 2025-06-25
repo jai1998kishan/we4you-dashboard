@@ -106,7 +106,7 @@ const authSignUpRoute = authSignUpImport.update({
 
 const authSignIn2Route = authSignIn2Import.update({
   id: '/(auth)/sign-in-2',
-  path: '/sign-in-2',
+  path: '/registration-vendor-company',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -118,7 +118,7 @@ const authSignInRoute = authSignInImport.update({
 
 const authRegistration1Route = authRegistration1Import.update({
   id: '/(auth)/registration1',
-  path: '/registration1',
+  path: '/registration-vendor',
   getParentRoute: () => rootRoute,
 } as any)
 
