@@ -47,7 +47,6 @@ export const columns: ColumnDef<Task>[] = [
     ),
     cell: ({ row }) => {
       const label = labels.find((label) => label.value === row.original.label)
-
       return (
         <div className='flex space-x-2'>
           {label && <Badge variant='outline'>{label.label}</Badge>}
@@ -67,11 +66,9 @@ export const columns: ColumnDef<Task>[] = [
       const status = statuses.find(
         (status) => status.value === row.getValue('status')
       )
-
       if (!status) {
         return null
       }
-
       return (
         <div className='flex w-[100px] items-center'>
           {status.icon && (
@@ -94,11 +91,9 @@ export const columns: ColumnDef<Task>[] = [
       const priority = priorities.find(
         (priority) => priority.value === row.getValue('priority')
       )
-
       if (!priority) {
         return null
       }
-
       return (
         <div className='flex items-center'>
           {priority.icon && (

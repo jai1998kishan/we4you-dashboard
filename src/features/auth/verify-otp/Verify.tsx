@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
 import { useState, useRef, useEffect } from 'react'
 import axios from 'axios'
-import { ArrowRight, Shield } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
+import { ArrowRight, Shield } from 'lucide-react'
 
 // Define the component as a functional component with React.FC
 const PremiumOTPVerification: React.FC = () => {
@@ -12,7 +12,7 @@ const PremiumOTPVerification: React.FC = () => {
   const [isComplete, setIsComplete] = useState<boolean>(false)
   const queryParams = new URLSearchParams(window.location.search)
   const phone_number = queryParams.get('phone')
-const navigate = useNavigate()
+  const navigate = useNavigate()
   useEffect(() => {
     if (inputRefs.current[0]) {
       inputRefs.current[0].focus()
@@ -80,36 +80,38 @@ const navigate = useNavigate()
     }
   }
 
-const handleSubmit = async () => {
-  const trimmedOtp = otp.join('').trim()
-  try {
-    const response = await axios.post(
-      `https://aeba-2401-4900-8846-d79b-acbb-808c-1b4c-3cb.ngrok-free.app/vendors/verify-otp`,
-      {
-        phone: phone_number,
-        otp: trimmedOtp,
+  const handleSubmit = async () => {
+    const trimmedOtp = otp.join('').trim()
+    try {
+      const response = await axios.post(
+        `https://h12dchk1-8000.inc1.devtunnels.ms/vendors/verify-otp`,
+        {
+          phone: phone_number,
+          otp: trimmedOtp,
+        }
+      )
+
+      if (response.status === 200) {
+        const { message, isVerified, data, sessionkey } = response.data
+
+        // Store in localStorage
+        localStorage.setItem(
+          'authData',
+          JSON.stringify({
+            message,
+            isVerified,
+            data,
+            sessionkey,
+          })
+        )
+
+        // Navigate after storing
+        navigate({ to: '/registration-vendor' })
       }
-    )
-
-    if (response.status === 200) {
-      const { message, isVerified, data, sessionkey } = response.data
-
-      // Store in localStorage
-      localStorage.setItem('authData', JSON.stringify({
-        message,
-        isVerified,
-        data,
-        sessionkey,
-      }))
-
-      // Navigate after storing
-      navigate({ to: "/registration-vendor" })
+    } catch (error) {
+      console.error('OTP verification failed:', error)
     }
-  } catch (error) {
-    console.error('OTP verification failed:', error)
   }
-}
-
 
   const handleResendOTP = () => {}
 
@@ -181,13 +183,11 @@ const handleSubmit = async () => {
                   : 'cursor-not-allowed bg-gray-200 text-gray-400'
               } `}
             >
-     
-                {' '}
-                <div className='flex items-center justify-center space-x-2'>
-                  <span>Verify OTP</span>
-                  <ArrowRight className='h-5 w-5' />
-                </div>
-          
+              {' '}
+              <div className='flex items-center justify-center space-x-2'>
+                <span>Verify OTP</span>
+                <ArrowRight className='h-5 w-5' />
+              </div>
             </button>
           </div>
 

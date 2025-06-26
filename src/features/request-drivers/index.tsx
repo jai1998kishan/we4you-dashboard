@@ -14,16 +14,13 @@ import {
   User,
 } from 'lucide-react'
 
-const RequestVendor = () => {
+const RequestDriver = () => {
   const [selectedImage, setSelectedImage] = useState(null)
   const [expandedCard, setExpandedCard] = useState(null)
   const [data, setData] = useState([])
 
-  const token =
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX3R5cGUiOiJzeXN0ZW1fYWRtaW5pc3RyYXRvciIsInVzZXJfaWQiOiI2ODVhMzYwZWM0YWQ3NjM4MTU1MjYyMWEifQ.4cpbsxsXdezF0Hzlb2zaPGCv1cVXkSkPkID4xPwF7AU'
-
   // Mock vendor requests data
-  const vendorRequests = [
+  const driverRequests = [
     {
       id: 1,
       company_name: 'TechCorp Solutions Pvt Ltd',
@@ -77,22 +74,10 @@ const RequestVendor = () => {
   ]
 
   const fetchData = async () => {
-    try {
-      const res = await axios.get(
-        'http://192.168.1.25:8000/vendors?account_status=false',
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, // or just token, depending on your backend setup
-          },
-        }
-      )
-      console.log('-------res----', res.data.data)
-      if (res) {
-        setData(res.data.data)
-      }
-    } catch (error) {
-      console.error('Fetching the request vendors approve:', error)
-    }
+    const res = await axios.get(
+      'https://aeba-2401-4900-8846-d79b-acbb-808c-1b4c-3cb.ngrok-free.app/vendors?page=1&limit=10'
+    )
+    console.log('-------res----', res)
   }
 
   useEffect(() => {
@@ -153,14 +138,14 @@ const RequestVendor = () => {
           <div className='flex items-center justify-between'>
             <div>
               <h1 className='text-2xl font-bold text-gray-900'>
-                Vendor Requests
+                Driver Requests
               </h1>
               <p className='mt-1 text-gray-600'>
-                Review and manage vendor registration requests
+                Review and manage driver registration requests
               </p>
             </div>
             <div className='rounded-lg bg-black px-4 py-2 text-sm font-medium text-white'>
-              {data?.length} Pending
+              {driverRequests.length} Pending
             </div>
           </div>
         </div>
@@ -169,9 +154,9 @@ const RequestVendor = () => {
       {/* Main Content */}
       <div className='mx-auto max-w-6xl px-6 py-8'>
         <div className='space-y-6'>
-          {data?.map((vendor) => (
+          {driverRequests.map((vendor) => (
             <div
-              key={vendor._id}
+              key={vendor.id}
               className='rounded-lg border bg-white shadow-sm'
             >
               {/* Card Header */}
@@ -187,17 +172,17 @@ const RequestVendor = () => {
                       </h2>
                       <p className='mt-1 flex items-center text-sm text-gray-500'>
                         <Calendar className='mr-1 h-4 w-4' />
-                        {formatDate(vendor.registerAt)}
+                        {formatDate(vendor.submitted_at)}
                       </p>
                     </div>
                   </div>
                   <button
-                    onClick={() => toggleCardExpansion(vendor._id)}
+                    onClick={() => toggleCardExpansion(vendor.id)}
                     className='flex items-center space-x-2 rounded-lg border border-gray-300 px-4 py-2 transition-colors hover:border-gray-400'
                   >
                     <Eye className='h-4 w-4' />
                     <span className='text-sm'>
-                      {expandedCard === vendor._id
+                      {expandedCard === vendor.id
                         ? 'Hide Details'
                         : 'Show Details'}
                     </span>
@@ -215,21 +200,20 @@ const RequestVendor = () => {
                   <div>
                     <p className='mb-1 text-sm text-gray-500'>Location</p>
                     <p className='font-medium text-gray-900'>
-                      {vendor.location.address}, {vendor.location.city},{' '}
-                      {vendor.location.state}
+                      {vendor.city}, {vendor.state}
                     </p>
                   </div>
                   <div>
                     <p className='mb-1 text-sm text-gray-500'>PAN Number</p>
                     <p className='font-medium text-gray-900'>
-                      {vendor.personal_uploads?.pan_card_number}
+                      {vendor.pan_card_number}
                     </p>
                   </div>
                 </div>
               </div>
 
               {/* Expanded Details */}
-              {expandedCard === vendor._id && (
+              {expandedCard === vendor.id && (
                 <div className='space-y-8 p-6'>
                   {/* Contact Information */}
                   <div>
@@ -272,27 +256,27 @@ const RequestVendor = () => {
                     <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3'>
                       <DocumentCard
                         title='GST Certificate'
-                        imageUrl={vendor.GST_certificate}
+                        imageUrl={vendor.documents.GST_certificate}
                       />
                       <DocumentCard
                         title='Aadhaar Front'
-                        imageUrl={vendor.personal_uploads.aadhaar_front_image}
+                        imageUrl={vendor.documents.aadhaar_front_image}
                       />
                       <DocumentCard
                         title='Aadhaar Rear'
-                        imageUrl={vendor.personal_uploads.aadhaar_rear_image}
+                        imageUrl={vendor.documents.aadhaar_rear_image}
                       />
                       <DocumentCard
                         title='PAN Card'
-                        imageUrl={vendor.personal_uploads.pan_card_image}
+                        imageUrl={vendor.documents.pan_card_image}
                       />
                       <DocumentCard
                         title='Registration Certificate'
-                        imageUrl={vendor.registration_certificate}
+                        imageUrl={vendor.documents.registration_certificate}
                       />
                       <DocumentCard
                         title='Signed Agreement'
-                        imageUrl={vendor.signed_agreement_copy}
+                        imageUrl={vendor.documents.signed_agreement_copy}
                       />
                     </div>
                   </div>
@@ -308,14 +292,14 @@ const RequestVendor = () => {
                   </p>
                   <div className='flex space-x-3'>
                     <button
-                      onClick={() => handleReject(vendor._id)}
+                      onClick={() => handleReject(vendor.id)}
                       className='flex items-center space-x-2 rounded-lg border border-gray-300 px-6 py-2 text-gray-700 transition-colors hover:bg-gray-50'
                     >
                       <X className='h-4 w-4' />
                       <span>Reject</span>
                     </button>
                     <button
-                      onClick={() => handleApprove(vendor._id)}
+                      onClick={() => handleApprove(vendor.id)}
                       className='flex items-center space-x-2 rounded-lg bg-black px-6 py-2 text-white transition-colors hover:bg-gray-800'
                     >
                       <Check className='h-4 w-4' />
@@ -357,4 +341,4 @@ const RequestVendor = () => {
   )
 }
 
-export default RequestVendor
+export default RequestDriver

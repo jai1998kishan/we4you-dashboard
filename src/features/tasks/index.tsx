@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react'
+import axios from 'axios'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
@@ -11,6 +13,34 @@ import TasksProvider from './context/tasks-context'
 import { tasks } from './data/tasks'
 
 export default function Tasks() {
+  const [data, setData] = useState([])
+
+  const token =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX3R5cGUiOiJzeXN0ZW1fYWRtaW5pc3RyYXRvciIsInVzZXJfaWQiOiI2ODVhMzYwZWM0YWQ3NjM4MTU1MjYyMWEifQ.4cpbsxsXdezF0Hzlb2zaPGCv1cVXkSkPkID4xPwF7AU'
+
+  const fetchData = async () => {
+    try {
+      const res = await axios.get(
+        'https://807d-2405-204-102c-3709-511b-97ea-35a0-69dc.ngrok-free.app/vendors',
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // or just token, depending on your backend setup
+          },
+        }
+      )
+      console.log(res)
+      if (res) {
+        setData(res.data.data)
+      }
+    } catch (error) {
+      console.error('Error in Fetching all vendors data: ', error)
+    }
+  }
+
+  useEffect(() => {
+    fetchData()
+  }, [])
+
   return (
     <TasksProvider>
       <Header fixed>

@@ -235,7 +235,7 @@ const PremiumRegistrationForm2: React.FC = () => {
 
     try {
       const response = await axios.post(
-        'https://aeba-2401-4900-8846-d79b-acbb-808c-1b4c-3cb.ngrok-free.app/vendors/company-details', 
+        'https://h12dchk1-8000.inc1.devtunnels.ms/vendors/company-details', 
         formDataToSend,
         {
           headers: {

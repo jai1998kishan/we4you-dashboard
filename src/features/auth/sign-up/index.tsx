@@ -11,26 +11,25 @@ export default function PremiumPhoneInput() {
   const navigate = useNavigate()
 
   const handleSubmit = async () => {
-  try {
-    const response = await axios.post(
-      'https://aeba-2401-4900-8846-d79b-acbb-808c-1b4c-3cb.ngrok-free.app/vendors/request-otp',
-      {
-        phone: phoneNumber,
-        country_code: 91,
+    try {
+      const response = await axios.post(
+        'https://h12dchk1-8000.inc1.devtunnels.ms/vendors/request-otp',
+        {
+          phone: phoneNumber,
+          country_code: 91,
+        }
+      )
+
+      // Check for successful response
+      if (response.status === 200 && phoneNumber.trim()) {
+        navigate({ to: `/verify?phone=${phoneNumber}` })
+      } else {
+        console.error('OTP request did not succeed:', response)
       }
-    );
-
-    // Check for successful response
-    if (response.status === 200 && phoneNumber.trim()) {
-      navigate({ to: `/verify?phone=${phoneNumber}` });
-    } else {
-      console.error('OTP request did not succeed:', response);
+    } catch (error) {
+      console.error('OTP request failed:', error)
     }
-  } catch (error) {
-    console.error('OTP request failed:', error);
   }
-};
-
 
   const handleInputChange = (e: any) => {
     const value = e.target.value
